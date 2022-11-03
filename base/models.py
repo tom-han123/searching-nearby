@@ -9,6 +9,7 @@ class user_location(models.Model):
     user_last_name = models.CharField(max_length=20,null=True,blank=True)
     image = models.CharField(max_length=100,blank=True)
     gender = models.CharField(max_length=20,null=True,blank=True)
+    age = models.IntegerField(null=True, blank=True)
     latitude = models.CharField(max_length=15, null=True)
     longitude = models.CharField(max_length=15, null=True)
 
