@@ -48,7 +48,8 @@ def nearbyApi(request, loc=''):
         lat =loc.split('&')[0]
         lng =loc.split('&')[1]
         range = loc.split('&')[2]
-        if len(range) == 3:
+        g = loc.split('&')[3]
+        if len(range) <=3 :
             r = 3
         elif len(range) == 4:
             r = 2
@@ -58,7 +59,7 @@ def nearbyApi(request, loc=''):
             r = 0    
         lat = lat.split('.')[0] + '.' + lat.split('.')[1][:r]
         lng = lng.split('.')[0] + '.' + lng.split('.')[1][:r]
-        location=user_location.objects.filter(latitude__startswith=lat, longitude__startswith=lng)
+        location=user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng, gender=g)
         if location:
             location_seri=user_loacation_serializer(location,many=True)
             return JsonResponse(location_seri.data,safe=False)
