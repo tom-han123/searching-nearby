@@ -48,12 +48,14 @@ def nearbyApi(request, loc=''):
         lat =loc.split('&')[0]
         lng =loc.split('&')[1]
         range = loc.split('&')[2]
-        if len(range) == 1:
+        if len(range) == 3:
+            r = 3
+        elif len(range) == 4:
             r = 2
-        elif len(range) == 2:
+        elif len(range) == 5:
             r = 1
         else:
-            r = 0
+            r = 0    
         lat = lat.split('.')[0] + '.' + lat.split('.')[1][:r]
         lng = lng.split('.')[0] + '.' + lng.split('.')[1][:r]
         location=user_location.objects.filter(latitude__startswith=lat, longitude__startswith=lng)
