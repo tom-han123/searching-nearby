@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>OSM and Leaflet</title>
+      <link rel = "stylesheet" href = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+   </head>         
+   <body>
+      <div id = "map" style = "width:100%; height:90vh"></div>
+      <script src = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+      <script>
+         
+         var userId = '3001'
+         lat = '16.8267772'
+         lng = '96.1383311'
+         gender = 'male'
+         age = '18-30'
+         // // Creating map options
+         var mapOptions = {
+               center: [lat, lng],
+               zoom: 10
+         }
+
+         // Creating a map object
+         var map = new L.map('map', mapOptions);
+         // Creating a Layer object
+         var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');           
+  
+         // Adding layer to the map
+         map.addLayer(layer);
+         var marker = new L.Marker([lat, lng]);
+         marker.addTo(map);
+         marker.on('click',()=>{
+            marker.bindPopup(userId).openPopup();
+         })
+         let previous_cir;
+         let previous_marker;
+
+         function search_nearby(){
+            var range = document.getElementById('range').value
+            const url = "http://127.0.0.1:8000/nearby/id="+userId+"&range="+range+"&gender="+gender+"&age="+age;
+ 
+            var new_cir = L.circle([lat, lng], range).addTo(map);
+           
+            
+            if(map.hasLayer(previous_cir)){
+               map.removeLayer(previous_cir)
+            }
+
+            previous_cir = new_cir
+
+            async function getapi(url) {
+      
+               // Storing response
+               const response = await fetch(url);
+               
+               // Storing data in form of JSON
+               var data = await response.json();
+               show_marker(data);
+            }
+            
+            getapi(url)
+
+            function show_marker(data){
+               let markergp = L.layerGroup()
+               for(let r of data){
+                  if(r.userId == userId){
+                     continue
+                  }
+                  console.log(r.userId)
+                  var markeroptions = {
+                     title: r.user_first_name
+                  }
+                  var m = new L.Marker([r.latitude, r.longitude], markeroptions)
+                  m.addTo(markergp)
+                  let pop = m.bindPopup(r.userId)
+                  m.on('click', function(e){
+                     pop.openPopup();
+                  })
+               }
+               markergp.addTo(map)
+
+               if(map.hasLayer(previous_marker)){
+                  map.removeLayer(previous_marker)
+               }
+
+               previous_marker = markergp
+
+            }
+
+         }
+         
+        
+                 
+        
+         // var iconOptions = {
+         //    iconUrl: 'images/download.jpg',
+         //    iconSize: [50, 50],
+         // }
+         // // Creating a custom icon
+         // var customIcon = L.icon(iconOptions);
+
+         //  // Creating a Marker
+         // var markerOptions = {
+         //    title: "MyLocation",
+         //    clickable: true,
+         //    draggable: true,
+         //    icon : customIcon
+         // }
+
+      </script>
+      <div class="search">
+         <input type = "text" id="range">
+         <button onclick="search_nearby()">Click</button>
+      </div>
+      
+   </body>
+</html>         
+                 

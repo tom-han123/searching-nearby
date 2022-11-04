@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from . serializers import user_loacation_serializer
 from . models import user_location
 import json
+import geopy.distance
 
 def landing(request):
     return HttpResponse('Hello')
@@ -49,28 +50,27 @@ def locationApi(request, pk=0):
             return JsonResponse("Message : "+str(e), safe=False)    
 
 @csrf_exempt
-def nearbyApi(request, pk=''):
+def nearbyApi(request, pk='', rng='', gen='', age=''):
     if request.method == 'GET':
         try:
-            user = user_location.objects.get(userId=pk.split('&')[0])
+            user = user_location.objects.get(userId=pk)
             lat = user.latitude
             lng = user.longitude
-            range = int(pk.split('&')[2])
-            g = pk.split('&')[1]
-            age = pk.split('&')[3]
-            r = 0
-            if range > 0 and range <=100:
-                r = 3
-            if range >=100 and range <= 1000:
-                r = 2
-            if range >=1000 and range <= 10000:
-                r = 1
-                           
-            lat = lat.split('.')[0] + '.' + lat.split('.')[1][:r]
-            lng = lng.split('.')[0] + '.' + lng.split('.')[1][:r]
+            coor1 = (lat,lng)
+            range = int(rng)       
+            lat = lat.split('.')[0] + '.' + lat.split('.')[1][:1]
+            lng = lng.split('.')[0] + '.' + lng.split('.')[1][:1]
             # return HttpResponse(lat+' '+lng+' '+ str(r)+' '+ age)
-            location=user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng, gender=g, age__gte=age.split('-')[0], age__lte=age.split('-')[1])
-            if location:
+            location_list = user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng).values()
+            user_li = []
+            for person in location_list:
+                coor2 = (list(person.values())[7],list(person.values())[8])
+                distance = geopy.distance.geodesic(coor1, coor2).m
+                print(distance)
+                if distance <= range:
+                    user_li.append(list(person.values())[1])
+            if user_li:
+                location=user_location.objects.filter(userId__in = user_li, gender=gen, age__gte=age.split('-')[0], age__lte=age.split('-')[1])
                 location_seri=user_loacation_serializer(location,many=True)
                 return JsonResponse(location_seri.data,safe=False)
             return JsonResponse('There is no one near you...', safe=False) 
