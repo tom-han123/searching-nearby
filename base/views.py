@@ -65,53 +65,56 @@ def nearbyApi(request, pk=''):
             location_list = user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng).values()
 
             range = int(request.GET.get('range'))
-            gen = request.GET.get('gender')
-            age = str(request.GET.get('age'))
+            gen = request.GET.get('gender', '')
+            age = str(request.GET.get('age', ''))
 
             #filter new_user_li by age range and gender
             user_li = []
+            
             for person in location_list:
-                coor2 = (list(person.values())[7],list(person.values())[8])
+
+                person_lat = person['latitude']
+                person_lng = person['longitude']
+                person_age = person['age']
+                person_gender = person['gender']
+            
+                coor2 = (person_lat,person_lng)
                 distance = geopy.distance.geodesic(coor1, coor2).m
-                print(distance)
+            
                 if distance <= range:
                     if gen == '':
                         if age == '':
                             user_li.append(dict(person))
                         elif '-' in age:
-                            if int(list(person.values())[6]) >= int(age.split('-')[0]) and  int(list(person.values())[6]) <= int(age.split('-')[1]):
+                            if person_age >= int(age.split('-')[0]) and  person_age <= int(age.split('-')[1]):
                                 user_li.append(dict(person))  
                         elif 'gte' in age:
-                            if int(list(person.values())[6]) >= int(age[3:]):
+                            if person_age >= int(age[3:]):
                                 user_li.append(dict(person))
                         elif 'lte' in age:
-                            if int(list(person.values())[6]) <= int(age[3:]):
+                            if person_age <= int(age[3:]):
                                 user_li.append(dict(person))
                     else:
                         if age == '':
-                            if list(person.values())[5] == gen:
+                            if person_gender == gen:
                                 user_li.append(dict(person))
                         elif  '-' in age:
-                            if int(list(person.values())[6]) >= int(age.split('-')[0]) and  int(list(person.values())[6]) <= int(age.split('-')[1]) and list(person.values())[5] == gen:
+                            if person_age >= int(age.split('-')[0]) and person_age <= int(age.split('-')[1]) and person_gender == gen:
                                 user_li.append(dict(person))           
                         elif 'gte' in age:
-                            if int(list(person.values())[6]) >= int(age[3:]) and list(person.values())[5] == gen: 
+                            if person_age >= int(age[3:]) and person_gender == gen: 
                                 user_li.append(dict(person))
                         elif 'lte' in age:
-                            if int(list(person.values())[6]) <= int(age[3:]) and list(person.values())[5] == gen:
+                            if person_age <= int(age[3:]) and person_gender == gen:
                                 user_li.append(dict(person))
                         else:
-                            if int(list(person.values())[6]) == int(age) and list(person.values())[5] == gen:
+                            if person_age == int(age) and person_gender == gen:
                                 user_li.append(dict(person))                 
             if user_li:
                 return JsonResponse(user_li, safe=False)
-            return JsonResponse('There is no one near you...', safe=False) 
+            return JsonResponse('There is no one near you...', safe=False)    
         except Exception as e:
-            return JsonResponse("Message : "+str(e),safe=False)       
-@csrf_exempt
-def search_nearby(request):
-    context ={}
-    return render(request, 'base/front_end.html')
+            return JsonResponse("Message : "+str(e),safe=False)
         
 
             
