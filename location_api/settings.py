@@ -87,13 +87,22 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME':'testing',
-        'USER':'tomhan',
-        'PASSWORD':password,
-        'HOST':'127.0.0.1',
-        'PORT':'3306'
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME':'testing',
+    #     'USER':'tomhan',
+    #     'PASSWORD':password,
+    #     'HOST':'127.0.0.1',
+    #     'PORT':'3306'
+    # }
+
+    'default':{
+        'ENGINE': 'djongo',
+        'CLIENT':{
+            'host':f'mongodb+srv://tomhan:{password}@projects.82bkb.mongodb.net/?retryWrites=true&w=majority',
+            'name':'user_location',
+            'authMechanism':'SCRAM-SHA-1'
+        }
     }
 }
 

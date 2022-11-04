@@ -80,7 +80,8 @@ def nearbyApi(request, pk=''):
             
                 coor2 = (person_lat,person_lng)
                 distance = geopy.distance.geodesic(coor1, coor2).m
-            
+                print(distance)
+        
                 if distance <= range:
                     if gen == '':
                         if age == '':
@@ -115,9 +116,5 @@ def nearbyApi(request, pk=''):
             return JsonResponse('There is no one near you...', safe=False)    
         except Exception as e:
             return JsonResponse("Message : "+str(e),safe=False)
-        
-
-            
-       
 
         
