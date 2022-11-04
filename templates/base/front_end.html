@@ -11,6 +11,7 @@
          const queryString = window.location.search;
          const urlParams = new URLSearchParams(queryString);
          var userId = urlParams.get('id')
+         console.log(userId)
          
          // user_url = 'http://127.0.0.1:8000/user_location/id='+userId;
 
@@ -30,7 +31,6 @@
          // for(let i of dd){
          //    console.log(i)
          // }
-
 
          lat = '16.8464795'
          lng = '96.128022'
@@ -59,7 +59,7 @@
 
          function search_nearby(){
             var range = document.getElementById('range').value
-            const url = "http://127.0.0.1:8000/nearby/id="+userId+"&range="+range+"&gender="+gender+"&age="+age;
+            const url = "http://127.0.0.1:8000/search_nearby/id="+userId+"?range="+range+"&gender="+gender+"&age="+age;
  
             var new_cir = L.circle([lat, lng], range).addTo(map);
            
@@ -88,7 +88,6 @@
                   if(r.userId == userId){
                      continue
                   }
-                  console.log(r.userId)
                   var markeroptions = {
                      title: r.user_first_name
                   }

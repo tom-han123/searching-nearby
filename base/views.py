@@ -56,49 +56,55 @@ def nearbyApi(request, pk=''):
             user = user_location.objects.get(userId=pk)
             lat = user.latitude
             lng = user.longitude
-            coor1 = (lat,lng)   
+            coor1 = (lat,lng)
+
             lat = lat.split('.')[0] + '.' + lat.split('.')[1][:1]
             lng = lng.split('.')[0] + '.' + lng.split('.')[1][:1]
+            
+            #extract user_list by filtering with latitude & longitude points range within 10km
+            location_list = user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng).values()
 
             range = int(request.GET.get('range'))
             gen = request.GET.get('gender')
             age = str(request.GET.get('age'))
 
-            location_list = user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng).values()
+            #filter new_user_li by age range and gender
             user_li = []
-
             for person in location_list:
                 coor2 = (list(person.values())[7],list(person.values())[8])
                 distance = geopy.distance.geodesic(coor1, coor2).m
                 print(distance)
                 if distance <= range:
-                    user_li.append(list(person.values())[1])
-
+                    if gen == '':
+                        if age == '':
+                            user_li.append(dict(person))
+                        elif '-' in age:
+                            if int(list(person.values())[6]) >= int(age.split('-')[0]) and  int(list(person.values())[6]) <= int(age.split('-')[1]):
+                                user_li.append(dict(person))  
+                        elif 'gte' in age:
+                            if int(list(person.values())[6]) >= int(age[3:]):
+                                user_li.append(dict(person))
+                        elif 'lte' in age:
+                            if int(list(person.values())[6]) <= int(age[3:]):
+                                user_li.append(dict(person))
+                    else:
+                        if age == '':
+                            if list(person.values())[5] == gen:
+                                user_li.append(dict(person))
+                        elif  '-' in age:
+                            if int(list(person.values())[6]) >= int(age.split('-')[0]) and  int(list(person.values())[6]) <= int(age.split('-')[1]) and list(person.values())[5] == gen:
+                                user_li.append(dict(person))           
+                        elif 'gte' in age:
+                            if int(list(person.values())[6]) >= int(age[3:]) and list(person.values())[5] == gen: 
+                                user_li.append(dict(person))
+                        elif 'lte' in age:
+                            if int(list(person.values())[6]) <= int(age[3:]) and list(person.values())[5] == gen:
+                                user_li.append(dict(person))
+                        else:
+                            if int(list(person.values())[6]) == int(age) and list(person.values())[5] == gen:
+                                user_li.append(dict(person))                 
             if user_li:
-                if gen == '':
-                    if age == '':
-                        location=user_location.objects.filter(userId__in = user_li)
-                    elif '-' in age:
-                        location=user_location.objects.filter(userId__in = user_li, age__gte=age.split('-')[0], age__lte=age.split('-')[1])
-                    elif 'lt' in age:
-                        location=user_location.objects.filter(userId__in = user_li, age__lt=age[2:])        
-                    elif 'gt' in age:
-                        location=user_location.objects.filter(userId__in = user_li, age__gt=age[2:])
-                    else:
-                        location=user_location.objects.filter(userId__in = user_li, age=age)
-                else:
-                    if age == '':
-                        location=user_location.objects.filter(userId__in = user_li, gender=gen)
-                    elif '-' in age:
-                        location=user_location.objects.filter(userId__in = user_li, gender=gen, age__gte=age.split('-')[0], age__lte=age.split('-')[1])
-                    elif 'lt' in age:
-                        location=user_location.objects.filter(userId__in = user_li, gender=gen, age__lt=age[2:])        
-                    elif 'gt' in age:
-                        location=user_location.objects.filter(userId__in = user_li, gender=gen, age__gt=age[2:])
-                    else:
-                        location=user_location.objects.filter(userId__in = user_li, gender=gen, age=age)        
-                location_seri=user_loacation_serializer(location,many=True)
-                return JsonResponse(location_seri.data,safe=False)
+                return JsonResponse(user_li, safe=False)
             return JsonResponse('There is no one near you...', safe=False) 
         except Exception as e:
             return JsonResponse("Message : "+str(e),safe=False)       
