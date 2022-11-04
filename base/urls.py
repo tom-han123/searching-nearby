@@ -5,5 +5,6 @@ urlpatterns =[
     path('', views.landing, name = 'landing'),
     path('user_location', views.locationApi),
     path('user_location/id=<str:pk>', views.locationApi),
-    path('nearby/id=<str:pk>&range=<str:rng>&gender=<str:gen>&age=<str:age>', views.nearbyApi),
+    path('search_nearby', views.search_nearby, name = 'nearbypage'),
+    path('nearby/id=<str:pk>', views.nearbyApi, name='nearby_result'),
 ]

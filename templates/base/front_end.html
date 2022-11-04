@@ -8,12 +8,34 @@
       <div id = "map" style = "width:100%; height:90vh"></div>
       <script src = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
       <script>
+         const queryString = window.location.search;
+         const urlParams = new URLSearchParams(queryString);
+         var userId = urlParams.get('id')
          
-         var userId = '3001'
-         lat = '16.8267772'
-         lng = '96.1383311'
-         gender = 'male'
-         age = '18-30'
+         // user_url = 'http://127.0.0.1:8000/user_location/id='+userId;
+
+         // async function get_singleuser_api(url) {
+      
+         //    // Storing response
+         //    const response = await fetch(user_url);
+            
+         //    // Storing data in form of JSON
+         //    var data = await response.json();
+         //    return data
+         // }
+
+         // var user_data = get_singleuser_api(user_url)
+         // const user_response = fetch(user_url)
+         // var dd = user_response.json()
+         // for(let i of dd){
+         //    console.log(i)
+         // }
+
+
+         lat = '16.8464795'
+         lng = '96.128022'
+         gender = 'female'
+         age = '18-40'
          // // Creating map options
          var mapOptions = {
                center: [lat, lng],
