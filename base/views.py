@@ -29,7 +29,7 @@ def locationApi(request, pk=0):
         if location_seri.is_valid():
             location_seri.save()
             return JsonResponse('Added Successfully...',safe=False)
-        return JsonResponse('failed to add',safe=False)  
+        return JsonResponse('Failed to add',safe=False)  
     elif request.method=='PUT':
         try:
             location_data = JSONParser().parse(request)
@@ -38,7 +38,7 @@ def locationApi(request, pk=0):
             if location_seri.is_valid():
                 location_seri.save()
                 return JsonResponse('update successfully',safe=False)
-            return JsonResponse('failed to update',safe=False)
+            return JsonResponse('Failed to update',safe=False)
         except Exception as e:
             return JsonResponse("Message : "+str(e), safe=False)     
     elif request.method=='DELETE':
@@ -58,8 +58,8 @@ def nearbyApi(request, pk=''):
             lng = user.longitude
             coor1 = (lat,lng)
 
-            lat = lat.split('.')[0] + '.' + lat.split('.')[1][:1]
-            lng = lng.split('.')[0] + '.' + lng.split('.')[1][:1]
+            lat = lat.split('.')[0]
+            lng = lng.split('.')[0]
             
             #extract user_list by filtering with latitude & longitude points range within 10km
             location_list = user_location.objects.filter(latitude__startswith=lat,longitude__startswith=lng).values()
